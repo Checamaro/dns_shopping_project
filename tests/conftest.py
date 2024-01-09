@@ -9,6 +9,6 @@ def set_up():
 
 @pytest.fixture(scope="module")
 def set_group():
-    print("Enter System")
+    print("\nEnter System")
     yield
-    print("Exit System")
+    print("\nExit System")

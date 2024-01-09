@@ -7,34 +7,29 @@ from base.base_class import Base
 
 class Cart_Page(Base):
 
-    def __init__(self, driver, main_page):
+    def __init__(self, driver):
         super().__init__(driver)
         self.driver = driver
-        self.main_page = main_page
+
 
     # Locators
 
-    checkout_button = "//div[5]/div[1]/div[1]/button[1]/span[1]"
-    cart_product_title = "//div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/a[1]"
+    checkout_button = "//form[1]/div[1]/div[2]/div[1]/div[1]/div[17]"
+    card_item_price = "//div[1]/div[4]/div[1]/div[3]/div[1]"
+    total_price = "//form[1]/div[1]/div[2]/div[1]/div[1]/div[14]/div[1]"
 
     # Getters
 
     def get_checkout_button(self):
         return WebDriverWait(self.driver, 30).until(EC.element_to_be_clickable((By.XPATH, self.checkout_button)))
 
-    def get_cart_product_title(self):
-        return WebDriverWait(self.driver, 30).until(EC.element_to_be_clickable((By.XPATH, self.cart_product_title)))
+    def get_card_item_price(self):
+        return WebDriverWait(self.driver, 30).until(EC.element_to_be_clickable((By.XPATH, self.card_item_price)))
+
+    def get_total_price(self):
+        return WebDriverWait(self.driver, 30).until(EC.element_to_be_clickable((By.XPATH, self.total_price)))
 
     # Actions
-
-    def test_compare_titles(self):
-        title_on_main_page = self.main_page.get_product_title()
-        title_on_cart_page = self.get_cart_product_title()
-
-        # Проверка, что названия совпадают частично (На этом сайте товар в корзине имеет сокращенный вид)
-        assert title_on_main_page in title_on_cart_page, f"Названия не совпадают. {title_on_main_page} не является частью {title_on_cart_page}"
-        assert len(title_on_cart_page) - len(
-            title_on_main_page) < 20, "Допустимое расстояние между названиями превышено"
 
     def click_checkout_button(self):
         self.get_checkout_button().click()
@@ -44,4 +39,7 @@ class Cart_Page(Base):
 
     def product_buying(self):
         self.get_current_url()
+        self.driver.maximize_window()
+        self.assert_prices_match(self.get_card_item_price, self.get_total_price)
         self.click_checkout_button()
+        self.get_screenshot()

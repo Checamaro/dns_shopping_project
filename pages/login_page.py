@@ -1,3 +1,4 @@
+from selenium.common import TimeoutException
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
@@ -7,7 +8,7 @@ from base.base_class import Base
 
 
 class Login_Page(Base):
-    url = 'https://www.dns-shop.ru/'
+    url = 'https://www.xcom-shop.ru/'
 
     def __init__(self, driver):
         super().__init__(driver)
@@ -15,21 +16,19 @@ class Login_Page(Base):
 
     # Locators
 
-    enter_button = "//div[1]/div[1]/div[2]/div[1]/div[1]/div[2]/div[2]/button[1]/span[1]"
-    enter_via_pass_button = "//div[1]/div[1]/div[1]/div[4]/div[2]/div[1]/div[1]/div[2]"
-    email = "//div[1]/div[1]/div[2]/div[1]/input[1]"
-    password = "//div[1]/div[1]/div[3]/div[1]/input[1]"
-    login_button = "//div[1]/div[1]/div[6]/div[1]/button[1]/span[1]"
-    user_menu = "//div[3]/div[2]/div[1]/div[1]/div[2]"
-    user_nickname = "//div[1]/div[1]/div[2]/div[1]/div[2]/a[1]"
+    enter_button = "//div[1]/div[7]/div[2]/div[1]/div[1]"
+    email = "//div[2]/input[1]"
+    password = "//form[1]/div[3]/input[1]"
+    login_button = "//div[5]/input[1]"
+    account_logo_button = "//div[1]/div[7]/div[2]/div[2]"
+    profile_button = "//div[7]/div[2]/div[2]/div[1]/div[2]/a[1]"
+    main_word = "//form[1]/div[1]/div[1]/div[1]/div[1]/div[1]"
+    login_error = "//form/div[4]"
 
     # Getters
 
     def get_enter_button(self):
         return WebDriverWait(self.driver, 30).until(EC.element_to_be_clickable((By.XPATH, self.enter_button)))
-
-    def get_enter_via_pass_button(self):
-        return WebDriverWait(self.driver, 30).until(EC.element_to_be_clickable((By.XPATH, self.enter_via_pass_button)))
 
     def get_email(self):
         return WebDriverWait(self.driver, 30).until(EC.element_to_be_clickable((By.XPATH, self.email)))
@@ -40,21 +39,23 @@ class Login_Page(Base):
     def get_login_button(self):
         return WebDriverWait(self.driver, 30).until(EC.element_to_be_clickable((By.XPATH, self.login_button)))
 
-    def get_user_menu(self):
-        return WebDriverWait(self.driver, 30).until(EC.element_to_be_clickable((By.XPATH, self.user_menu)))
+    def get_account_logo_button(self):
+        return WebDriverWait(self.driver, 30).until(EC.element_to_be_clickable((By.XPATH, self.account_logo_button)))
 
-    def get_user_nickname(self):
-        return WebDriverWait(self.driver, 30).until(EC.element_to_be_clickable((By.XPATH, self.user_nickname)))
+    def get_profile_button(self):
+        return WebDriverWait(self.driver, 30).until(EC.element_to_be_clickable((By.XPATH, self.profile_button)))
+
+    def get_main_word(self):
+        return WebDriverWait(self.driver, 30).until(EC.element_to_be_clickable((By.XPATH, self.main_word)))
+
+    def get_login_error(self):
+        return WebDriverWait(self.driver, 30).until(EC.element_to_be_clickable((By.XPATH, self.login_error)))
 
     # Actions
 
     def click_enter_button(self):
         self.get_enter_button().click()
         print("Нажатие кнопки 'Войти'")
-
-    def click_enter_via_pass_button(self):
-        self.get_enter_button().click()
-        print("Нажатие кнопки 'Войти с паролем'")
 
     def input_email(self, email):
         self.get_email().send_keys(email)
@@ -68,10 +69,17 @@ class Login_Page(Base):
         self.get_login_button().click()
         print("Нажатие кнопки 'Войти(с введенными данными)'")
 
-    def mouse_point_on_user_menu(self):
-        action = ActionChains(self.driver)
-        action.move_to_element(self.get_user_menu().perform())
-        print("Наводим мышь на аватар профиля")
+    def click_account_logo_button(self):
+        self.get_account_logo_button().click()
+        print("Нажатие на аватар пользователя")
+
+    def click_profile_button(self):
+        self.get_profile_button().click()
+        print("Просмотр информации о зарегистрированном пользователе")
+
+    def return_to_main_page(self):
+        self.driver.back()
+        print("Возврат на главную страницу")
 
     # Methods
 
@@ -80,9 +88,25 @@ class Login_Page(Base):
         self.driver.maximize_window()
         self.get_current_url()
         self.click_enter_button()
-        self.click_enter_via_pass_button()
-        self.input_email("kirill.sharevich@yandex.ru")
-        self.input_password("qwerty123456")
+        self.input_email("788test567@gmail.com")
+        self.input_password("o5emsk7u")
         self.click_login_button()
-        self.mouse_point_on_user_menu()
-        self.assert_word(self.get_user_nickname, 'Пришелец-BC48623')
+        try:
+            alert = WebDriverWait(self.driver, 10).until(EC.alert_is_present())
+            alert_text = alert.text
+            print(f"Alert text: {alert_text}")
+            alert.accept()
+        except:
+            pass
+        self.click_login_button()
+        try:
+            alert = WebDriverWait(self.driver, 10).until(EC.alert_is_present())
+            alert_text = alert.text
+            print(f"Alert text: {alert_text}")
+            alert.accept()
+        except:
+            pass
+        self.click_account_logo_button()
+        self.click_profile_button()
+        self.assert_word_f(self.get_main_word, 'Полиграф Шариков')
+        self.return_to_main_page()

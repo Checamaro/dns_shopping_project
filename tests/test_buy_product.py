@@ -9,7 +9,7 @@ from pages.products_page import Products_Page
 def test_buy_product(set_group):
     options = webdriver.ChromeOptions()
     options.add_experimental_option("detach", True)
-    g = Service('C:\\Users\\checa\\PycharmProjects\\pythonProject\\oop\\chromedriver.exe')
+    g = Service('C:\\Users\\checa\\PycharmProjects\\pythonProject\\xcom_shop_project\\chromedriver.exe')
     driver = webdriver.Chrome(options=options, service=g)
 
     login = Login_Page(driver)
